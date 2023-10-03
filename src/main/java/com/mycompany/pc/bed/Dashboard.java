@@ -6,6 +6,9 @@ package com.mycompany.pc.bed;
 
 import com.formdev.flatlaf.FlatLightLaf;
 import java.awt.Color;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 /**
  *
@@ -20,9 +23,12 @@ public class Dashboard extends javax.swing.JFrame {
         initComponents();
         InitStyles();
         FlatLightLaf.setup();
+        SetDate();
     }
     
     private void InitStyles(){
+        mensaje.putClientProperty( "FlatLaf.style", "font: 14 $light.font" );
+        mensaje.setForeground(Color.black);
         navText.putClientProperty( "FlatLaf.style", "font: bold $h3.regular.font" );
         navText.setForeground(Color.white);
         dateText.putClientProperty( "FlatLaf.style", "font: 24 $light.font" );
@@ -30,7 +36,12 @@ public class Dashboard extends javax.swing.JFrame {
         appName.putClientProperty( "FlatLaf.style", "font: bold $h1.regular.font" );
         appName.setForeground(Color.white);
     }
-
+    
+    private void SetDate(){
+        LocalDate now = LocalDate.now();
+        Locale spanishLocale = new Locale("es", "ES");
+        dateText.setText(now.format(DateTimeFormatter.ofPattern("'Hoy es' EEEE dd 'de' MMMM 'de' yyyy", spanishLocale)));
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -53,6 +64,7 @@ public class Dashboard extends javax.swing.JFrame {
         navText = new javax.swing.JLabel();
         dateText = new javax.swing.JLabel();
         content = new javax.swing.JPanel();
+        mensaje = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -92,7 +104,7 @@ public class Dashboard extends javax.swing.JFrame {
         configuracion.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         configuracion.setForeground(new java.awt.Color(255, 255, 255));
         configuracion.setIcon(new javax.swing.ImageIcon(getClass().getResource("/figuras/work-from-home.png"))); // NOI18N
-        configuracion.setText("prueba");
+        configuracion.setText("Ayuda");
         configuracion.setBorder(javax.swing.BorderFactory.createMatteBorder(1, 12, 1, 1, new java.awt.Color(0, 0, 0)));
         configuracion.setBorderPainted(false);
         configuracion.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -202,6 +214,8 @@ public class Dashboard extends javax.swing.JFrame {
             .addGap(0, 0, Short.MAX_VALUE)
         );
 
+        mensaje.setText("Bienvenido de nuevo!");
+
         javax.swing.GroupLayout backgroundLayout = new javax.swing.GroupLayout(background);
         background.setLayout(backgroundLayout);
         backgroundLayout.setHorizontalGroup(
@@ -210,13 +224,19 @@ public class Dashboard extends javax.swing.JFrame {
                 .addComponent(menu, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGroup(backgroundLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(content, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(header, javax.swing.GroupLayout.DEFAULT_SIZE, 750, Short.MAX_VALUE)))
+                    .addComponent(header, javax.swing.GroupLayout.DEFAULT_SIZE, 750, Short.MAX_VALUE)
+                    .addGroup(backgroundLayout.createSequentialGroup()
+                        .addGap(18, 18, 18)
+                        .addComponent(mensaje)
+                        .addContainerGap())))
         );
         backgroundLayout.setVerticalGroup(
             backgroundLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(menu, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(backgroundLayout.createSequentialGroup()
-                .addGap(61, 61, 61)
+                .addGap(29, 29, 29)
+                .addComponent(mensaje)
+                .addGap(18, 18, 18)
                 .addGroup(backgroundLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(backgroundLayout.createSequentialGroup()
                         .addGap(148, 148, 148)
@@ -284,6 +304,7 @@ public class Dashboard extends javax.swing.JFrame {
     private javax.swing.JLabel dateText;
     private javax.swing.JPanel header;
     private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JLabel mensaje;
     private javax.swing.JPanel menu;
     private javax.swing.JLabel navText;
     private javax.swing.JButton principal;
