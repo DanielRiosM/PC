@@ -137,6 +137,9 @@ public class Login extends javax.swing.JFrame {
         separador2.setForeground(new java.awt.Color(0, 0, 0));
 
         login.setIcon(new javax.swing.ImageIcon(getClass().getResource("/botones/Login.png"))); // NOI18N
+        login.setBorder(null);
+        login.setBorderPainted(false);
+        login.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         login.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 loginActionPerformed(evt);
@@ -154,6 +157,9 @@ public class Login extends javax.swing.JFrame {
         jLabel4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/figuras/Group.png"))); // NOI18N
 
         exit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/botones/Salir.png"))); // NOI18N
+        exit.setBorder(null);
+        exit.setBorderPainted(false);
+        exit.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         exit.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 exitActionPerformed(evt);
