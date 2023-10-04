@@ -62,6 +62,7 @@ public class Login extends javax.swing.JFrame {
             StringBuilder response = new StringBuilder();
             while ((inputLine = bf.readLine()) != null) {
                 response.append(inputLine);
+                System.out.println(inputLine);
             }
             JSONObject json = new JSONObject(response.toString());
             resultado = json.getString("status");
