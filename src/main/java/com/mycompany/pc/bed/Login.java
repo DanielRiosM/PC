@@ -149,6 +149,7 @@ public class Login extends javax.swing.JFrame {
 
         separador2.setForeground(new java.awt.Color(0, 0, 0));
 
+        login.setBackground(new java.awt.Color(255, 255, 255));
         login.setIcon(new javax.swing.ImageIcon(getClass().getResource("/botones/Login.png"))); // NOI18N
         login.setBorder(null);
         login.setBorderPainted(false);
@@ -169,6 +170,7 @@ public class Login extends javax.swing.JFrame {
 
         jLabel4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/figuras/Group.png"))); // NOI18N
 
+        exit.setBackground(new java.awt.Color(255, 255, 255));
         exit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/botones/Salir.png"))); // NOI18N
         exit.setBorder(null);
         exit.setBorderPainted(false);

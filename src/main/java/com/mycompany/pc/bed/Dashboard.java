@@ -5,7 +5,7 @@
 package com.mycompany.pc.bed;
 
 import com.formdev.flatlaf.FlatLightLaf;
-import com.mycompany.pc.views.Principal;
+import com.mycompany.pc.views.*;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.time.LocalDate;
@@ -89,6 +89,8 @@ public class Dashboard extends javax.swing.JFrame {
         setPreferredSize(new java.awt.Dimension(1020, 640));
 
         background.setBackground(new java.awt.Color(255, 255, 255));
+        background.setMinimumSize(new java.awt.Dimension(1020, 640));
+        background.setPreferredSize(new java.awt.Dimension(1020, 640));
 
         menu.setBackground(new java.awt.Color(98, 142, 141));
         menu.setPreferredSize(new java.awt.Dimension(270, 640));
@@ -119,6 +121,11 @@ public class Dashboard extends javax.swing.JFrame {
         principal.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         principal.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         principal.setIconTextGap(14);
+        principal.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                principalActionPerformed(evt);
+            }
+        });
 
         configuracion.setBackground(new java.awt.Color(122, 163, 162));
         configuracion.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
@@ -141,6 +148,11 @@ public class Dashboard extends javax.swing.JFrame {
         tecnicos2.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         tecnicos2.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         tecnicos2.setIconTextGap(12);
+        tecnicos2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                tecnicos2ActionPerformed(evt);
+            }
+        });
 
         configuracion1.setBackground(new java.awt.Color(122, 163, 162));
         configuracion1.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
@@ -209,7 +221,7 @@ public class Dashboard extends javax.swing.JFrame {
                 .addGroup(headerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(dateText, javax.swing.GroupLayout.PREFERRED_SIZE, 700, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(navText, javax.swing.GroupLayout.PREFERRED_SIZE, 646, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(41, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         headerLayout.setVerticalGroup(
             headerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -245,27 +257,25 @@ public class Dashboard extends javax.swing.JFrame {
             .addGroup(backgroundLayout.createSequentialGroup()
                 .addComponent(menu, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGroup(backgroundLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(header, javax.swing.GroupLayout.DEFAULT_SIZE, 767, Short.MAX_VALUE)
                     .addGroup(backgroundLayout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(backgroundLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(content, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addGroup(backgroundLayout.createSequentialGroup()
-                                .addComponent(mensaje)
-                                .addGap(0, 0, Short.MAX_VALUE)))
-                        .addContainerGap())))
+                        .addGap(6, 6, 6)
+                        .addComponent(mensaje)
+                        .addContainerGap(640, Short.MAX_VALUE))
+                    .addComponent(content, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(header, javax.swing.GroupLayout.DEFAULT_SIZE, 750, Short.MAX_VALUE)))
         );
         backgroundLayout.setVerticalGroup(
             backgroundLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(menu, javax.swing.GroupLayout.DEFAULT_SIZE, 646, Short.MAX_VALUE)
+            .addComponent(menu, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(backgroundLayout.createSequentialGroup()
                 .addGap(29, 29, 29)
                 .addComponent(mensaje)
                 .addGap(18, 18, 18)
-                .addComponent(header, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(content, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+                .addGroup(backgroundLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(backgroundLayout.createSequentialGroup()
+                        .addGap(149, 149, 149)
+                        .addComponent(content, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(header, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -282,6 +292,16 @@ public class Dashboard extends javax.swing.JFrame {
         pack();
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void principalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_principalActionPerformed
+        // TODO add your handling code here:
+        ShowJPanel(new Principal());
+    }//GEN-LAST:event_principalActionPerformed
+
+    private void tecnicos2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tecnicos2ActionPerformed
+        // TODO add your handling code here:
+        ShowJPanel(new Tecnicos());
+    }//GEN-LAST:event_tecnicos2ActionPerformed
 
     /**
      * @param args the command line arguments
