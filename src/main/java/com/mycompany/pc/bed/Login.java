@@ -18,6 +18,7 @@ import java.util.logging.Logger;
 import javax.net.ssl.HttpsURLConnection;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
+import org.json.JSONObject;
 
 /**
  *
@@ -26,6 +27,7 @@ import javax.swing.UIManager;
 public class Login extends javax.swing.JFrame {
 
     String line;
+    String resultado;
     public Login() {
         initComponents();
         setIconImage(getIconImage());
@@ -42,36 +44,47 @@ public class Login extends javax.swing.JFrame {
         String Pass = pass.getText();
         
         String body = "{\"email\": \" "+User+"\", \"password\": \" " + Pass+"\"}";
+        
         URL url = new URL("https://bic-edalmarc-back-end.cyclic.app/administrator/signin");
         HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
         conn.setRequestMethod("POST");
         conn.setDoOutput(true);
         conn.setRequestProperty("Content-Type", "application/json");
         conn.setRequestProperty("User-Agent", "Mozilla/5.0");
-        try (DataOutputStream dos = new DataOutputStream(conn.getOutputStream())) {
-            
-            dos.writeBytes(body);
-}
-
-        try (BufferedReader bf = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
-            
-            while ((line = bf.readLine()) != null) {
-                System.out.println(line);
-    }
-}
-       
         
+        
+        try (DataOutputStream dos = new DataOutputStream(conn.getOutputStream())) {
+            dos.writeBytes(body);
+        }
+                    
+        try (BufferedReader bf = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
+            String inputLine;
+            StringBuilder response = new StringBuilder();
+            while ((inputLine = bf.readLine()) != null) {
+                response.append(inputLine);
+                System.out.println(inputLine);
+            }
+            JSONObject json = new JSONObject(response.toString());
+            resultado = json.getString("status");
+        }
+      
+        int responseCode = conn.getResponseCode();
         if(User.equals("")|| Pass.equals("")){
             JOptionPane.showMessageDialog(this,"Uno o mas campos estan vacios. Favor de llenarlos");
         }else{
             try{
-                if(conn.getResponseCode() == 200){
+                if("SUCCESS".equals(resultado)){
+                    
                     this.dispose();
-                    new Dashboard().setVisible(true);
+                    new Dashboard().setVisible(true); 
                 }else{
-                    JOptionPane.showMessageDialog(this,"Credenciales incorrectas. Vuelve a intentar de nuevo.");
+                    if("FAILED".equals(resultado)){
+                        
+                        JOptionPane.showMessageDialog(this,"Credenciales incorrectas. Vuelve a intentar de nuevo.");
+                        }else{
+                            JOptionPane.showMessageDialog(this,"Oops!");
+                        }
                 }
-                
             }catch(Exception e){
                 System.err.println(e.toString());
                 JOptionPane.showMessageDialog(this,"Ocurrio un error inesperado.\nFavor comunicarse con el administrador.");
