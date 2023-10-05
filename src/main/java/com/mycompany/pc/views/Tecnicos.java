@@ -5,6 +5,20 @@
 package com.mycompany.pc.views;
 
 import java.awt.Color;
+import java.awt.Image;
+import java.awt.Toolkit;
+import java.awt.event.KeyEvent;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.net.ssl.HttpsURLConnection;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JTextField;
 
 /**
  *
@@ -15,15 +29,86 @@ public class Tecnicos extends javax.swing.JPanel {
     /**
      * Creates new form Principal
      */
+    String line;
     public Tecnicos() {
         initComponents();
         InitStyles();
     }
+   
     
-        private void InitStyles(){
-        title.putClientProperty("FlatLaf.style", "font: light $h1.regular.font");
+    private void InitStyles(){
+        title.putClientProperty("FlatLaf.style", "font: bold $h1.regular.font");
         title.setForeground(Color.black);
+        name.putClientProperty("FlatLaf.style", "font: bold $h3.regular.font");
+        name.setForeground(Color.black);
+        email.putClientProperty("FlatLaf.style", "font: bold $h3.regular.font");
+        email.setForeground(Color.black);
+        tel.putClientProperty("FlatLaf.style", "font: bold $h3.regular.font");
+        tel.setForeground(Color.black);
+        contra.putClientProperty("FlatLaf.style", "font: bold $h3.regular.font");
+        contra.setForeground(Color.black);
     }
+    
+    
+     public void Crear()throws IOException{
+            String nombre = nom.getText();
+            String cor = correo.getText();
+            String celu = cel.getText();
+            String Pass = pass.getText();
+            JTextField caja;
+            JLabel error;
+            
+            String body = "{\"nombre\": \""+nombre+"\", \"email\": \"" + cor+"\", \"telefono\": \"" + celu+"\", \"password\": \"" + Pass+"\"}";
+            URL url = new URL("https://bic-edalmarc-back-end.cyclic.app/administrator/signup");
+            HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
+            conn.setRequestMethod("POST");
+            conn.setDoOutput(true);
+            conn.setRequestProperty("Content-Type", "application/json");
+            conn.setRequestProperty("User-Agent", "Mozilla/5.0");
+            try (DataOutputStream dos = new DataOutputStream(conn.getOutputStream())) {
+ 
+                dos.writeBytes(body);
+                }
+
+            try (BufferedReader bf = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
+            
+                while ((line = bf.readLine()) != null) {
+                    System.out.println(line);
+        }
+}
+            
+            
+            
+            
+            
+            try{
+                if(nombre.equals("") || cor.equals("") || celu.equals("") || Pass.equals("")){
+                     JOptionPane.showMessageDialog(this,"Uno o mas campos estan vacios. Favor de llenarlos");
+                    
+                }else{
+                 
+                    
+                    JOptionPane.showMessageDialog(this,"Se ha agregado un tecnico de manera correcta con los datos:\n"+nom.getText()+"\n"+correo.getText()+"\n"+cel.getText()+"\n"+pass.getText());
+                    for(int i = 0; i< bg.getComponentCount();i++){
+                    if(bg.getComponent(i).getClass().getName().equals("javax.swing.JTextField")){
+                        caja = (JTextField)bg.getComponent(i);
+                        caja.setText("");
+                        nom.requestFocus();
+                        correo.requestFocus();
+                        cel.requestFocus();
+                        pass.requestFocus();
+                        }  
+                    }
+                   // JOptionPane.showMessageDialog(this,"Se ha agregado un tecnico de manera correcta con los datos:"+nom.getText()+" "+correo.getText()+" "+cel.getText()+" "+pass.getText());
+                    
+                }
+                
+            }catch (Exception e){
+                JOptionPane.showMessageDialog(this,"Llamar al administrador por el fallo del servidor");
+            }
+            }
+    
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -35,14 +120,17 @@ public class Tecnicos extends javax.swing.JPanel {
 
         bg = new javax.swing.JPanel();
         title = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
-        jTextField2 = new javax.swing.JTextField();
-        jTextField3 = new javax.swing.JTextField();
-        jTextField4 = new javax.swing.JTextField();
+        nom = new javax.swing.JTextField();
+        correo = new javax.swing.JTextField();
+        cel = new javax.swing.JTextField();
+        pass = new javax.swing.JTextField();
         name = new javax.swing.JLabel();
         tel = new javax.swing.JLabel();
         email = new javax.swing.JLabel();
-        pass = new javax.swing.JLabel();
+        contra = new javax.swing.JLabel();
+        login = new javax.swing.JButton();
+        jLabel2 = new javax.swing.JLabel();
+        jLabel1 = new javax.swing.JLabel();
 
         setBackground(new java.awt.Color(255, 255, 255));
         setPreferredSize(new java.awt.Dimension(750, 430));
@@ -52,61 +140,119 @@ public class Tecnicos extends javax.swing.JPanel {
         bg.setPreferredSize(new java.awt.Dimension(750, 430));
 
         title.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        title.setText("TECNICOS");
+        title.setText("Registrar un Tecnico o un Administrador");
 
-        name.setText("jLabel1");
+        nom.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                nomKeyPressed(evt);
+            }
+        });
 
-        tel.setText("jLabel1");
+        correo.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                correoKeyPressed(evt);
+            }
+        });
 
-        email.setText("jLabel1");
+        cel.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                celKeyPressed(evt);
+            }
+        });
 
-        pass.setText("jLabel1");
+        pass.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                passKeyPressed(evt);
+            }
+        });
+
+        name.setText("Nombre");
+
+        tel.setText("Telefono");
+
+        email.setText("Correo");
+
+        contra.setText("Contraseña");
+
+        login.setBackground(new java.awt.Color(255, 255, 255));
+        login.setIcon(new javax.swing.ImageIcon(getClass().getResource("/botones/Regresar.png"))); // NOI18N
+        login.setBorder(null);
+        login.setBorderPainted(false);
+        login.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        login.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                loginActionPerformed(evt);
+            }
+        });
+
+        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/img-registro.png"))); // NOI18N
+
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/edalmarc-mini.jpg"))); // NOI18N
 
         javax.swing.GroupLayout bgLayout = new javax.swing.GroupLayout(bg);
         bg.setLayout(bgLayout);
         bgLayout.setHorizontalGroup(
             bgLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(bgLayout.createSequentialGroup()
-                .addGap(249, 249, 249)
-                .addComponent(title, javax.swing.GroupLayout.PREFERRED_SIZE, 209, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(292, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, bgLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(94, 94, 94)
                 .addGroup(bgLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(pass)
-                    .addComponent(email)
-                    .addComponent(tel)
-                    .addComponent(name))
-                .addGap(109, 109, 109)
-                .addGroup(bgLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 264, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTextField3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 264, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTextField2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 264, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTextField4, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 264, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap())
+                    .addComponent(title, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, bgLayout.createSequentialGroup()
+                        .addGroup(bgLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(bgLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                .addComponent(email, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(name, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(tel)
+                            .addComponent(contra))
+                        .addGap(31, 31, 31)
+                        .addGroup(bgLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(pass)
+                            .addComponent(cel)
+                            .addComponent(correo)
+                            .addComponent(nom)))
+                    .addGroup(bgLayout.createSequentialGroup()
+                        .addGroup(bgLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(bgLayout.createSequentialGroup()
+                                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addGroup(bgLayout.createSequentialGroup()
+                                .addComponent(login, javax.swing.GroupLayout.DEFAULT_SIZE, 127, Short.MAX_VALUE)
+                                .addGap(178, 178, 178)))
+                        .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(227, 227, 227))
         );
         bgLayout.setVerticalGroup(
             bgLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(bgLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(title)
-                .addGap(37, 37, 37)
+                .addGap(25, 25, 25)
+                .addComponent(title, javax.swing.GroupLayout.DEFAULT_SIZE, 26, Short.MAX_VALUE)
+                .addGap(41, 41, 41)
                 .addGroup(bgLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(name))
-                .addGap(18, 18, 18)
+                    .addComponent(name, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(nom, javax.swing.GroupLayout.DEFAULT_SIZE, 25, Short.MAX_VALUE))
+                .addGap(6, 6, 6)
                 .addGroup(bgLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(email))
-                .addGap(18, 18, 18)
+                    .addComponent(email, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(correo, javax.swing.GroupLayout.DEFAULT_SIZE, 26, Short.MAX_VALUE))
+                .addGap(6, 6, 6)
                 .addGroup(bgLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(tel))
-                .addGap(18, 18, 18)
+                    .addComponent(tel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(cel, javax.swing.GroupLayout.DEFAULT_SIZE, 27, Short.MAX_VALUE))
+                .addGap(6, 6, 6)
                 .addGroup(bgLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(pass))
-                .addContainerGap(234, Short.MAX_VALUE))
+                    .addComponent(contra, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(pass, javax.swing.GroupLayout.DEFAULT_SIZE, 27, Short.MAX_VALUE))
+                .addGroup(bgLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(bgLayout.createSequentialGroup()
+                        .addGap(28, 28, 28)
+                        .addComponent(login, javax.swing.GroupLayout.PREFERRED_SIZE, 34, Short.MAX_VALUE)
+                        .addGap(61, 61, 61)
+                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(61, 61, 61))
+                    .addGroup(bgLayout.createSequentialGroup()
+                        .addGap(18, 18, 18)
+                        .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -121,16 +267,56 @@ public class Tecnicos extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    private void loginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loginActionPerformed
+        try {
+            Crear();
+        } catch (IOException ex) {
+            Logger.getLogger(Tecnicos.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_loginActionPerformed
+
+    private void nomKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_nomKeyPressed
+        // TODO add your handling code here:
+         if(evt.getExtendedKeyCode() == KeyEvent.VK_ENTER){
+            correo.requestFocus();
+        }
+    }//GEN-LAST:event_nomKeyPressed
+
+    private void correoKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_correoKeyPressed
+        // TODO add your handling code here:
+        if(evt.getExtendedKeyCode() == KeyEvent.VK_ENTER){
+            cel.requestFocus();
+        }
+    }//GEN-LAST:event_correoKeyPressed
+
+    private void celKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_celKeyPressed
+        // TODO add your handling code here:
+        if(evt.getExtendedKeyCode() == KeyEvent.VK_ENTER){
+            pass.requestFocus();
+        }
+    }//GEN-LAST:event_celKeyPressed
+
+    private void passKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_passKeyPressed
+        // TODO add your handling code here:
+         if(evt.getExtendedKeyCode() == KeyEvent.VK_ENTER){
+            login.requestFocus();
+            login.doClick();
+        }
+    }//GEN-LAST:event_passKeyPressed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel bg;
+    private javax.swing.JTextField cel;
+    private javax.swing.JLabel contra;
+    private javax.swing.JTextField correo;
     private javax.swing.JLabel email;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
-    private javax.swing.JTextField jTextField3;
-    private javax.swing.JTextField jTextField4;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JButton login;
     private javax.swing.JLabel name;
-    private javax.swing.JLabel pass;
+    private javax.swing.JTextField nom;
+    private javax.swing.JTextField pass;
     private javax.swing.JLabel tel;
     private javax.swing.JLabel title;
     // End of variables declaration//GEN-END:variables
