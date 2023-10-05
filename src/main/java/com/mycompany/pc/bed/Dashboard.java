@@ -86,7 +86,6 @@ public class Dashboard extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setMinimumSize(new java.awt.Dimension(1020, 640));
-        setPreferredSize(new java.awt.Dimension(1020, 640));
 
         background.setBackground(new java.awt.Color(255, 255, 255));
         background.setMinimumSize(new java.awt.Dimension(1020, 640));
@@ -110,6 +109,11 @@ public class Dashboard extends javax.swing.JFrame {
         Reportes.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         Reportes.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         Reportes.setIconTextGap(14);
+        Reportes.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ReportesActionPerformed(evt);
+            }
+        });
 
         principal.setBackground(new java.awt.Color(122, 163, 162));
         principal.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
@@ -302,6 +306,11 @@ public class Dashboard extends javax.swing.JFrame {
         // TODO add your handling code here:
         ShowJPanel(new Tecnicos());
     }//GEN-LAST:event_tecnicos2ActionPerformed
+
+    private void ReportesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ReportesActionPerformed
+        // TODO add your handling code here:
+        ShowJPanel(new Registro());
+    }//GEN-LAST:event_ReportesActionPerformed
 
     /**
      * @param args the command line arguments
