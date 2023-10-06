@@ -4,73 +4,115 @@
  */
 package com.mycompany.pc.views;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mycompany.pc.clases.informe;
+import com.mycompany.pc.views.informacion;
+import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Image;
-import java.awt.Toolkit;
-import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.URI;
+import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.awt.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.net.ssl.HttpsURLConnection;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JTextField;
-
+import org.json.JSONArray;
+import org.json.JSONObject;
+import javax.swing.JPanel;
 /**
  *
  * @author danie
  */
 public class Registro extends javax.swing.JPanel {
-    HttpClient cliente = HttpClient.newBuilder().version(HttpClient.Version.HTTP_2).build();
-    /**
-     * Creates new form Principal
-     */
-    String Url = "https://bic-edalmarc-back-end.cyclic.app/inform/read";
-    ObjectMapper mapper = new ObjectMapper();
+ 
+    String line;
+    public static String IDtecnico_update ;
     public Registro() {
+        
         initComponents();
         InitStyles();
-        mostrar();
+        tabla();
+        
     }
    
-    private void mostrar(){
-        HttpRequest peticion = HttpRequest.newBuilder().GET().uri(URI.create(Url)).build();
-        try{
-            HttpResponse <String>response = cliente.send(peticion, HttpResponse.BodyHandlers.ofString());
-            
-             System.out.println(response.body());
-        }catch(Exception e){
-            
-        }
-    }
-    
-    private <T> T getData(String json, TypeReference<T> referencia){
-        try{
-            return mapper.readValue(json, referencia);
-        }catch(Exception e){
-            e.printStackTrace();
-        }
-        return null;
-    }
     private void InitStyles(){
         title.putClientProperty("FlatLaf.style", "font: bold $h1.regular.font");
         title.setForeground(Color.black);
-        
     }
     
-    
+    public void tabla() {
+        DefaultTableModel model = (DefaultTableModel) tabla.getModel();
+        try {
+            URL url = new URL("https://bic-edalmarc-back-end.cyclic.app/inform/read");
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+            conn.setDoOutput(true);
+            conn.setRequestProperty("Content-Type", "application/json");
+            conn.setRequestProperty("User-Agent", "Mozilla/5.0");
+
+            BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            StringBuilder response = new StringBuilder();
+            String line;
+
+            while ((line = reader.readLine()) != null) {
+                response.append(line);
+            }
+            reader.close();
+            conn.disconnect();
+
+            // Analizar la respuesta JSON como un objeto JSON
+            JSONObject jsonResponse = new JSONObject(response.toString());
+
+            // Obtener el arreglo JSON dentro del objeto JSON
+            JSONArray jsonArray = jsonResponse.getJSONArray("data");
+
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject jsonObject = jsonArray.getJSONObject(i);
+                String column1Value = jsonObject.getString("_id");
+                String column2Value = jsonObject.getString("fechaInicio");
+                String column3Value = jsonObject.getString("fechaFinal");
+                JSONArray column4Value = jsonObject.getJSONArray("descripcion");
+                JSONArray column5Value = jsonObject.getJSONArray("materiales");
+                int column6Value = jsonObject.getInt("monto");
+                String column7Value = jsonObject.getString("responsable");
+
+                // Agregar una nueva fila a la tabla
+                model.addRow(new Object[]{column1Value, column2Value, column3Value, column4Value, column5Value, column6Value, column7Value});
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        tabla.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int fila_point = tabla.rowAtPoint(e.getPoint());
+                int columna_point = 0;
+
+                if (fila_point > -1) {
+                    IDtecnico_update = (String) model.getValueAt(fila_point, columna_point);
+                    informacion infoPanel = new informacion();
+
+                    // Crear un JFrame para mostrar el JPanel
+                    JFrame frame = new JFrame("Información");
+
+                    // Establecer el administrador de diseño BorderLayout para el JFrame
+                    frame.setLayout(new BorderLayout());
+
+                    // Agregar el JPanel al JFrame en la región izquierda (WEST)
+                    frame.add(infoPanel, BorderLayout.WEST);
+
+                    // Establecer el tamaño y otras propiedades del JFrame
+                    frame.setSize(750, 430);
+                    frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                    frame.setVisible(true);
+                }
+
+            }
+
+        });
+
+    }
+
     
     /**
      * This method is called from within the constructor to initialize the form.
@@ -84,7 +126,7 @@ public class Registro extends javax.swing.JPanel {
         bg = new javax.swing.JPanel();
         title = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        tabla = new javax.swing.JTable();
 
         setBackground(new java.awt.Color(255, 255, 255));
         setPreferredSize(new java.awt.Dimension(750, 430));
@@ -96,7 +138,7 @@ public class Registro extends javax.swing.JPanel {
         title.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         title.setText("Registrar un Tecnico o un Administrador");
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        tabla.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
@@ -105,23 +147,14 @@ public class Registro extends javax.swing.JPanel {
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, false
+                true, true, false, true, true, true, true
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
                 return canEdit [columnIndex];
             }
         });
-        jScrollPane1.setViewportView(jTable1);
-        if (jTable1.getColumnModel().getColumnCount() > 0) {
-            jTable1.getColumnModel().getColumn(0).setResizable(false);
-            jTable1.getColumnModel().getColumn(1).setResizable(false);
-            jTable1.getColumnModel().getColumn(2).setResizable(false);
-            jTable1.getColumnModel().getColumn(3).setResizable(false);
-            jTable1.getColumnModel().getColumn(4).setResizable(false);
-            jTable1.getColumnModel().getColumn(5).setResizable(false);
-            jTable1.getColumnModel().getColumn(6).setResizable(false);
-        }
+        jScrollPane1.setViewportView(tabla);
 
         javax.swing.GroupLayout bgLayout = new javax.swing.GroupLayout(bg);
         bg.setLayout(bgLayout);
@@ -133,17 +166,17 @@ public class Registro extends javax.swing.JPanel {
                 .addGap(227, 227, 227))
             .addGroup(bgLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 571, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 571, Short.MAX_VALUE)
+                .addGap(169, 169, 169))
         );
         bgLayout.setVerticalGroup(
             bgLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(bgLayout.createSequentialGroup()
                 .addGap(25, 25, 25)
-                .addComponent(title)
+                .addComponent(title, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 298, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(75, Short.MAX_VALUE))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 298, Short.MAX_VALUE)
+                .addGap(75, 75, 75))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -162,7 +195,7 @@ public class Registro extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel bg;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
+    private javax.swing.JTable tabla;
     private javax.swing.JLabel title;
     // End of variables declaration//GEN-END:variables
 }
