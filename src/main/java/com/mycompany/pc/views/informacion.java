@@ -6,25 +6,70 @@ package com.mycompany.pc.views;
 
 import java.awt.Color;
 
+import com.mongodb.client.*;
+import com.mongodb.client.gridfs.*;
+import com.mongodb.client.model.Filters;
+import org.bson.Document;
+import org.bson.types.ObjectId;
+
+import javax.swing.*;
+import java.awt.*;
+import java.io.IOException;
+import org.bson.conversions.Bson;
+
+
 /**
  *
  * @author danie
  */
 public class informacion extends javax.swing.JPanel {
 
-    /**
-     * Creates new form Principal
-     */
+    
     String IDtecnico_update;
     public informacion() {
         initComponents();
         IDtecnico_update = Registro.IDtecnico_update;
         InitStyles();
+        displayImage();
     }
     
         private void InitStyles(){
         
     }
+    
+        private void displayImage() {
+        MongoClient mongoClient = MongoClients.create("mongodb://localhost:27017"); // Cambia la URL de conexión según tu configuración
+        MongoDatabase database = mongoClient.getDatabase("Bic-edalmarc"); // Reemplaza "tu_base_de_datos" con el nombre de tu base de datos
+        GridFSBucket gridFSBucket = GridFSBuckets.create(database);
+
+        // Reemplaza "tu_id_mason" con el valor de id_mason que deseas utilizar para identificar la imagen
+        String idMason = IDtecnico_update;
+
+        // Encuentra la imagen en la colección por id_mason
+        Bson filter = Filters.eq("id_mason", idMason);
+        FindIterable<Document> iterable = database.getCollection("images").find(filter);
+        Document imageDocument = iterable.first();
+
+        if (imageDocument != null) {
+            ObjectId imageId = imageDocument.getObjectId("_id");
+
+            try {
+                // Recuperar la imagen desde MongoDB
+                byte[] imageData = gridFSBucket.openDownloadStream(imageId).readAllBytes();
+
+                ImageIcon imageIcon = new ImageIcon(imageData);
+                JLabel label = new JLabel(imageIcon);
+                bg.removeAll(); // Elimina cualquier componente anterior
+                bg.add(label);
+                revalidate(); // Vuelve a validar el panel para reflejar los cambios
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            System.out.println("No se encontró una imagen con id_mason: " + idMason);
+        }
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
