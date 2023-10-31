@@ -3,6 +3,7 @@ com\mycompany\pc\views\Tecnicos$2.class
 com\mycompany\pc\bed\Login$3.class
 com\mycompany\pc\views\Tecnicos.class
 com\mycompany\pc\views\Principal.class
+com\mycompany\pc\views\informacion.class
 com\mycompany\pc\views\Tecnicos$1.class
 com\mycompany\pc\bed\Dashboard$2.class
 com\mycompany\pc\bed\Login$4.class
@@ -10,11 +11,10 @@ com\mycompany\pc\views\Tecnicos$5.class
 com\mycompany\pc\bed\Login$1.class
 com\mycompany\pc\bed\Login$5.class
 com\mycompany\pc\views\Tecnicos$4.class
-com\mycompany\pc\clases\informe.class
 com\mycompany\pc\bed\Dashboard$1.class
 com\mycompany\pc\bed\Dashboard.class
-.netbeans_automatic_build
 com\mycompany\pc\bed\Login$2.class
+com\mycompany\pc\views\Registro$2.class
 com\mycompany\pc\views\Registro.class
 com\mycompany\pc\bed\Dashboard$3.class
 com\mycompany\pc\views\Tecnicos$3.class

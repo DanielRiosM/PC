@@ -36,5 +36,20 @@
             <artifactId>jackson-databind</artifactId>
             <version>2.15.2</version>
         </dependency>
+        <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongodb-driver-sync</artifactId>
+            <version>4.3.1</version> <!-- Asegúrate de usar la última versión disponible -->
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.2.6</version> <!-- Asegúrate de usar la última versión disponible -->
+        </dependency>
+        <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>bson</artifactId>
+            <version>4.3.1</version> <!-- Asegúrate de usar la misma versión que tu controlador MongoDB -->
+        </dependency>
     </dependencies>
 </project>
