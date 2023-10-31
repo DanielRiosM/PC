@@ -5,17 +5,20 @@
 package com.mycompany.pc.views;
 
 import java.awt.Color;
-
-import com.mongodb.client.*;
-import com.mongodb.client.gridfs.*;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import org.bson.Document;
 import org.bson.types.ObjectId;
-
-import javax.swing.*;
-import java.awt.*;
-import java.io.IOException;
-import org.bson.conversions.Bson;
 
 
 /**
@@ -24,54 +27,74 @@ import org.bson.conversions.Bson;
  */
 public class informacion extends javax.swing.JPanel {
 
-    
-    String IDtecnico_update;
+     String IDtecnico_update;
+
     public informacion() {
         initComponents();
         IDtecnico_update = Registro.IDtecnico_update;
         InitStyles();
-        displayImage();
-    }
-    
-        private void InitStyles(){
-        
-    }
-    
-        private void displayImage() {
-        MongoClient mongoClient = MongoClients.create("mongodb+srv://Edalmarc:udrNYnjBDhQvub8x@bic-edalmarc.svgqcpw.mongodb.net/Edalmarc?retryWrites=true&w=majority"); // Cambia la URL de conexión según tu configuración
-        MongoDatabase database = mongoClient.getDatabase("Bic-edalmarc"); // Reemplaza "tu_base_de_datos" con el nombre de tu base de datos
-        GridFSBucket gridFSBucket = GridFSBuckets.create(database);
 
-        // Reemplaza "tu_id_mason" con el valor de id_mason que deseas utilizar para identificar la imagen
-        String idMason =  "653b02444e6a684ef6e37be2";
-        ObjectId objectId = new ObjectId(idMason);
-        
+        // Llamar a un método para cargar y mostrar la imagen
+        showImage();
+    }
 
-        // Encuentra la imagen en la colección por id_mason
-            Bson filter = Filters.eq("_id", objectId);
-            FindIterable<Document> iterable = database.getCollection("images").find(filter);
-            Document imageDocument = iterable.first();
-            System.out.println(imageDocument);
+    private void InitStyles() {
+        // Configura estilos de tu JPanel si es necesario
+    }
+
+    // Método para cargar y mostrar la imagen desde MongoDB
+    private void showImage() {
+        // Supongamos que tienes una instancia de MongoDB y una colección llamada 'images'
+
+        // Obtén la imagen desde la base de datos
+        byte[] imageData = getImageFromMongoDB();
+
+        // Convierte los datos de la imagen a un BufferedImage
+        try {
+            ByteArrayInputStream bis = new ByteArrayInputStream(imageData);
+            BufferedImage image = ImageIO.read(bis);
+
+            // Crea un JLabel para mostrar la imagen
+            JLabel imageLabel = new JLabel(new ImageIcon(image));
             
+            // Agrega el JLabel al JPanel 'bg' (o al contenedor que desees)
+            bg.add(imageLabel);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    private byte[] getImageFromMongoDB() {
+        try (MongoClient client = MongoClients.create("mongodb+srv://Edalmarc:udrNYnjBDhQvub8x@bic-edalmarc.svgqcpw.mongodb.net/Edalmarc?retryWrites=true&w=majority")) {
+            MongoDatabase database = client.getDatabase("Edalmarc");
+            MongoCollection<Document> collection = database.getCollection("images");
+
+            ObjectId idMasonValue = new ObjectId(IDtecnico_update);
+            Document imageDocument = collection.find(Filters.eq("id_mason", idMasonValue)).first();
+
             if (imageDocument != null) {
-                ObjectId imageId = imageDocument.getObjectId("_id");
-                System.out.println(imageId);
-
-                try {
-                    byte[] imageData = gridFSBucket.openDownloadStream(imageId).readAllBytes();
-
-                    ImageIcon imageIcon = new ImageIcon(imageData);
-                    JLabel label = new JLabel(imageIcon);
-                    bg.removeAll();
-                    bg.add(label);
-                    revalidate();
-                } catch (IOException e) {
-                    e.printStackTrace();
+                Document imageObject = imageDocument.get("image", Document.class);
+                if (imageObject != null) {
+                    org.bson.types.Binary imageData = imageObject.get("data", org.bson.types.Binary.class);
+                    if (imageData != null) {
+                        return imageData.getData();
+                    } else {
+                        System.out.println("Los datos de la imagen son nulos.");
+                    }
+                } else {
+                    System.out.println("El objeto 'image' no se encontró en el documento.");
                 }
             } else {
-                System.out.println("No se encontró un documento con _id: " + idMason);
+                System.out.println("La imagen no se encontró en la base de datos.");
             }
+
+            return null;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
+    
     
     /**
      * This method is called from within the constructor to initialize the form.
