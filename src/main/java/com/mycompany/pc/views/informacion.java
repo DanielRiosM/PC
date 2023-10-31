@@ -38,36 +38,39 @@ public class informacion extends javax.swing.JPanel {
     }
     
         private void displayImage() {
-        MongoClient mongoClient = MongoClients.create("mongodb://localhost:27017"); // Cambia la URL de conexión según tu configuración
+        MongoClient mongoClient = MongoClients.create("mongodb+srv://Edalmarc:udrNYnjBDhQvub8x@bic-edalmarc.svgqcpw.mongodb.net/Edalmarc?retryWrites=true&w=majority"); // Cambia la URL de conexión según tu configuración
         MongoDatabase database = mongoClient.getDatabase("Bic-edalmarc"); // Reemplaza "tu_base_de_datos" con el nombre de tu base de datos
         GridFSBucket gridFSBucket = GridFSBuckets.create(database);
 
         // Reemplaza "tu_id_mason" con el valor de id_mason que deseas utilizar para identificar la imagen
-        String idMason = IDtecnico_update;
+        String idMason =  "653b02444e6a684ef6e37be2";
+        ObjectId objectId = new ObjectId(idMason);
+        
 
         // Encuentra la imagen en la colección por id_mason
-        Bson filter = Filters.eq("id_mason", idMason);
-        FindIterable<Document> iterable = database.getCollection("images").find(filter);
-        Document imageDocument = iterable.first();
+            Bson filter = Filters.eq("_id", objectId);
+            FindIterable<Document> iterable = database.getCollection("images").find(filter);
+            Document imageDocument = iterable.first();
+            System.out.println(imageDocument);
+            
+            if (imageDocument != null) {
+                ObjectId imageId = imageDocument.getObjectId("_id");
+                System.out.println(imageId);
 
-        if (imageDocument != null) {
-            ObjectId imageId = imageDocument.getObjectId("_id");
+                try {
+                    byte[] imageData = gridFSBucket.openDownloadStream(imageId).readAllBytes();
 
-            try {
-                // Recuperar la imagen desde MongoDB
-                byte[] imageData = gridFSBucket.openDownloadStream(imageId).readAllBytes();
-
-                ImageIcon imageIcon = new ImageIcon(imageData);
-                JLabel label = new JLabel(imageIcon);
-                bg.removeAll(); // Elimina cualquier componente anterior
-                bg.add(label);
-                revalidate(); // Vuelve a validar el panel para reflejar los cambios
-            } catch (IOException e) {
-                e.printStackTrace();
+                    ImageIcon imageIcon = new ImageIcon(imageData);
+                    JLabel label = new JLabel(imageIcon);
+                    bg.removeAll();
+                    bg.add(label);
+                    revalidate();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                System.out.println("No se encontró un documento con _id: " + idMason);
             }
-        } else {
-            System.out.println("No se encontró una imagen con id_mason: " + idMason);
-        }
     }
     
     /**
