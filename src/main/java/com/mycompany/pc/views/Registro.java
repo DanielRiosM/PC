@@ -102,7 +102,7 @@ public class Registro extends javax.swing.JPanel {
                     frame.add(infoPanel, BorderLayout.WEST);
 
                     // Establecer el tamaño y otras propiedades del JFrame
-                    frame.setSize(750, 430);
+                    frame.setSize(1020, 720);
                     frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
                     frame.setVisible(true);
                 }
