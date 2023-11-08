@@ -17,6 +17,7 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
+import java.awt.Image;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
@@ -63,11 +64,18 @@ public class informacion extends javax.swing.JPanel {
                     if (imageData != null) {
                         byte[] imageDataBytes = imageData.getData();
 
-                        // Crea un ImageIcon a partir de los datos de la imagen
-                        ImageIcon imageIcon = new ImageIcon(imageDataBytes);
+                        // Cargar la imagen
+                    ImageIcon originalImageIcon = new ImageIcon(imageDataBytes);
 
-                        // Establece el ImageIcon en el JLabel
-                        jLabel1.setIcon(imageIcon);
+                    // Redimensionar la imagen a 435x375 píxeles
+                    Image originalImage = originalImageIcon.getImage();
+                    Image resizedImage = originalImage.getScaledInstance(435, 375, Image.SCALE_SMOOTH);
+
+                    // Crear un ImageIcon a partir de la imagen redimensionada
+                    ImageIcon resizedImageIcon = new ImageIcon(resizedImage);
+
+                    // Establecer el ImageIcon redimensionado en el JLabel
+                    jLabel1.setIcon(resizedImageIcon);
                     } else {
                         jLabel1.setText("Los datos de la imagen son nulos.");
                     }
@@ -102,11 +110,18 @@ public class informacion extends javax.swing.JPanel {
                     if (imageData != null) {
                         byte[] imageDataBytes = imageData.getData();
 
-                        // Crea un ImageIcon a partir de los datos de la imagen
-                        ImageIcon imageIcon = new ImageIcon(imageDataBytes);
+                            // Cargar la imagen
+                    ImageIcon originalImageIcon = new ImageIcon(imageDataBytes);
 
-                        // Establece el ImageIcon en el JLabel
-                        jLabel2.setIcon(imageIcon);
+                    // Redimensionar la imagen a 435x375 píxeles
+                    Image originalImage = originalImageIcon.getImage();
+                    Image resizedImage = originalImage.getScaledInstance(435, 375, Image.SCALE_SMOOTH);
+
+                    // Crear un ImageIcon a partir de la imagen redimensionada
+                    ImageIcon resizedImageIcon = new ImageIcon(resizedImage);
+
+                    // Establecer el ImageIcon redimensionado en el JLabel
+                    jLabel2.setIcon(resizedImageIcon);
                     } else {
                         jLabel2.setText("Los datos de la imagen son nulos.");
                     }
@@ -136,6 +151,7 @@ public class informacion extends javax.swing.JPanel {
         bg = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
+        jSeparator1 = new javax.swing.JSeparator();
 
         setBackground(new java.awt.Color(255, 255, 255));
         setPreferredSize(new java.awt.Dimension(1020, 720));
@@ -143,6 +159,8 @@ public class informacion extends javax.swing.JPanel {
         bg.setBackground(new java.awt.Color(255, 255, 255));
         bg.setMinimumSize(new java.awt.Dimension(0, 0));
         bg.setPreferredSize(new java.awt.Dimension(1020, 720));
+
+        jSeparator1.setForeground(new java.awt.Color(0, 0, 0));
 
         javax.swing.GroupLayout bgLayout = new javax.swing.GroupLayout(bg);
         bg.setLayout(bgLayout);
@@ -152,7 +170,9 @@ public class informacion extends javax.swing.JPanel {
                 .addGap(76, 76, 76)
                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 435, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 435, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(bgLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jSeparator1)
+                    .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 435, Short.MAX_VALUE))
                 .addContainerGap(68, Short.MAX_VALUE))
         );
         bgLayout.setVerticalGroup(
@@ -162,7 +182,9 @@ public class informacion extends javax.swing.JPanel {
                 .addGroup(bgLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 375, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 375, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(244, 244, 244))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -182,5 +204,6 @@ public class informacion extends javax.swing.JPanel {
     private javax.swing.JPanel bg;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JSeparator jSeparator1;
     // End of variables declaration//GEN-END:variables
 }
