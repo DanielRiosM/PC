@@ -7,6 +7,7 @@ package com.mycompany.pc.views;
 import com.mycompany.pc.views.informacion;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.*;
@@ -15,6 +16,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.StringJoiner;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import javax.swing.JPanel;
@@ -70,13 +72,18 @@ public class Registro extends javax.swing.JPanel {
                 String column1Value = jsonObject.getString("_id");
                 String column2Value = jsonObject.getString("fechaInicio");
                 String column3Value = jsonObject.getString("fechaFinal");
-                JSONArray column4Value = jsonObject.getJSONArray("descripcion");
-                JSONArray column5Value = jsonObject.getJSONArray("materiales");
+                JSONArray column5Array = jsonObject.getJSONArray("materiales");
+                StringJoiner materialsJoiner = new StringJoiner(", "); // Utilizamos StringJoiner para concatenar los elementos del array
+                for (int j = 0; j < column5Array.length(); j++) {
+                    String material = column5Array.getString(j);
+                    materialsJoiner.add(material);
+                }
+                String column5Value = materialsJoiner.toString();
                 int column6Value = jsonObject.getInt("monto");
                 String column7Value = jsonObject.getString("responsable");
 
                 // Agregar una nueva fila a la tabla
-                model.addRow(new Object[]{column1Value, column2Value, column3Value, column4Value, column5Value, column6Value, column7Value});
+                model.addRow(new Object[]{column1Value, column2Value, column3Value, column5Value, column6Value, column7Value});
             }
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -143,11 +150,11 @@ public class Registro extends javax.swing.JPanel {
 
             },
             new String [] {
-                "Id", "Fecha Inicio", "Fecha Final", "Descripcion", "Materiales", "Monto", "Responsable"
+                "Id", "Fecha Inicio", "Fecha Final", "Materiales", "Monto", "Responsable"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                true, true, false, true, true, true, true
+                true, true, false, true, true, true
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
