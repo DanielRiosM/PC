@@ -72,6 +72,13 @@ public class Registro extends javax.swing.JPanel {
                 String column1Value = jsonObject.getString("_id");
                 String column2Value = jsonObject.getString("fechaInicio");
                 String column3Value = jsonObject.getString("fechaFinal");
+                JSONArray column4Array = jsonObject.getJSONArray("descripcion");
+                StringJoiner materialsJoinerr = new StringJoiner(", "); // Utilizamos StringJoiner para concatenar los elementos del array
+                for (int j = 0; j < column4Array.length(); j++) {
+                    String material = column4Array.getString(j);
+                    materialsJoinerr.add(material);
+                }
+                String column4Value = materialsJoinerr.toString();
                 JSONArray column5Array = jsonObject.getJSONArray("materiales");
                 StringJoiner materialsJoiner = new StringJoiner(", "); // Utilizamos StringJoiner para concatenar los elementos del array
                 for (int j = 0; j < column5Array.length(); j++) {
@@ -83,7 +90,7 @@ public class Registro extends javax.swing.JPanel {
                 String column7Value = jsonObject.getString("responsable");
 
                 // Agregar una nueva fila a la tabla
-                model.addRow(new Object[]{column1Value, column2Value, column3Value, column5Value, column6Value, column7Value});
+                model.addRow(new Object[]{column1Value, column2Value, column3Value, column4Value,column5Value, column6Value, column7Value});
             }
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -150,11 +157,11 @@ public class Registro extends javax.swing.JPanel {
 
             },
             new String [] {
-                "Id", "Fecha Inicio", "Fecha Final", "Materiales", "Monto", "Responsable"
+                "Id", "Fecha Inicio", "Fecha Final", "Descripcion", "Materiales", "Monto", "Responsable"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                true, true, false, true, true, true
+                true, true, false, true, true, true, true
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
