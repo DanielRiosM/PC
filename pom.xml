@@ -56,5 +56,10 @@
             <artifactId>pdfbox</artifactId>
             <version>2.0.27</version> <!-- La versión puede cambiar, verifica la última versión en el repositorio Maven -->
         </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-csv</artifactId>
+            <version>1.8</version> <!-- Verifica la versión más reciente en Maven Central -->
+        </dependency>
     </dependencies>
 </project>

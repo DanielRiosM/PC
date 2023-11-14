@@ -15,13 +15,17 @@ import javax.swing.table.DefaultTableModel;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.StringJoiner;
@@ -29,6 +33,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import javax.swing.JPanel;
 import javax.swing.filechooser.FileSystemView;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
@@ -68,7 +74,7 @@ public class Registro extends javax.swing.JPanel {
             conn.setRequestProperty("Content-Type", "application/json");
             conn.setRequestProperty("User-Agent", "Mozilla/5.0");
 
-            BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8));
             StringBuilder response = new StringBuilder();
             String line;
 
@@ -177,24 +183,8 @@ public class Registro extends javax.swing.JPanel {
             new String [] {
                 "Id", "Fecha Inicio", "Fecha Final", "Descripcion", "Materiales", "Monto", "Responsable"
             }
-        ) {
-            boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, false
-            };
-
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit [columnIndex];
-            }
-        });
+        ));
         jScrollPane1.setViewportView(tabla);
-        if (tabla.getColumnModel().getColumnCount() > 0) {
-            tabla.getColumnModel().getColumn(0).setResizable(false);
-            tabla.getColumnModel().getColumn(1).setResizable(false);
-            tabla.getColumnModel().getColumn(2).setResizable(false);
-            tabla.getColumnModel().getColumn(3).setResizable(false);
-            tabla.getColumnModel().getColumn(4).setResizable(false);
-            tabla.getColumnModel().getColumn(6).setResizable(false);
-        }
 
         descargar.setBackground(new java.awt.Color(255, 255, 255));
         descargar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/figuras/descarga.png"))); // NOI18N
@@ -253,7 +243,6 @@ public class Registro extends javax.swing.JPanel {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
             String fechaActual = sdf.format(new Date());
 
-            // Configurar el JFileChooser
             JFileChooser fileChooser = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
             fileChooser.setDialogTitle("Seleccione la carpeta de destino");
             fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -266,28 +255,22 @@ public class Registro extends javax.swing.JPanel {
                 String nombreArchivo = "registro_" + fechaActual + ".csv";
                 String rutaCompleta = carpetaDestino.getAbsolutePath() + File.separator + nombreArchivo;
 
-                try (BufferedWriter writer = new BufferedWriter(new FileWriter(rutaCompleta))) {
+                try (PrintWriter writer = new PrintWriter(new OutputStreamWriter(new FileOutputStream(rutaCompleta), StandardCharsets.UTF_8), true);
+                        CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT.withHeader(tabla.getColumnName(0), tabla.getColumnName(1), tabla.getColumnName(2), tabla.getColumnName(3), tabla.getColumnName(4), tabla.getColumnName(5), tabla.getColumnName(6)))) {
+
+                    int rows = tabla.getRowCount();
                     int cols = tabla.getColumnCount();
 
-                    // Escribir encabezados
-                    for (int i = 0; i < cols; i++) {
-                        writer.write(tabla.getColumnName(i));
-                        if (i < cols - 1) {
-                            writer.write(",");
-                        }
-                    }
-                    writer.newLine();
-
-                    // Escribir datos
-                    for (int i = 0; i < tabla.getRowCount(); i++) {
-                        for (int j = 0; j < cols; j++) {
-                            String cellValue = tabla.getValueAt(i, j).toString().replace('\n', ' ');
-                            writer.write(cellValue);
-                            if (j < cols - 1) {
-                                writer.write(",");
-                            }
-                        }
-                        writer.newLine();
+                    for (int i = 0; i < rows; i++) {
+                        csvPrinter.printRecord(
+                                tabla.getValueAt(i, 0),
+                                tabla.getValueAt(i, 1),
+                                tabla.getValueAt(i, 2),
+                                tabla.getValueAt(i, 3),
+                                tabla.getValueAt(i, 4),
+                                tabla.getValueAt(i, 5),
+                                tabla.getValueAt(i, 6)
+                        );
                     }
 
                     JOptionPane.showMessageDialog(null, "Datos exportados a " + rutaCompleta, "Exportación Exitosa", JOptionPane.INFORMATION_MESSAGE);
