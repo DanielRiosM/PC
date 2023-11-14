@@ -28,6 +28,7 @@ import java.util.StringJoiner;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import javax.swing.JPanel;
+import javax.swing.filechooser.FileSystemView;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
@@ -252,47 +253,48 @@ public class Registro extends javax.swing.JPanel {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
             String fechaActual = sdf.format(new Date());
 
-            String nombreArchivo = "registro_" + fechaActual + ".csv";
-            String rutaCompleta = rutaCarpeta + nombreArchivo;
+            // Configurar el JFileChooser
+            JFileChooser fileChooser = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
+            fileChooser.setDialogTitle("Seleccione la carpeta de destino");
+            fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+            fileChooser.setAcceptAllFileFilterUsed(false);
 
-            // Verificar si la carpeta existe, si no, crearla
-            File carpeta = new File(rutaCarpeta);
-            if (!carpeta.exists()) {
-                if (carpeta.mkdirs()) {
-                    System.out.println("Carpeta creada: " + rutaCarpeta);
-                } else {
-                    System.err.println("Error al crear la carpeta: " + rutaCarpeta);
-                }
-            }
+            int userSelection = fileChooser.showSaveDialog(this);
 
-            try (BufferedWriter writer = new BufferedWriter(new FileWriter(rutaCompleta))) {
-                int cols = tabla.getColumnCount();
+            if (userSelection == JFileChooser.APPROVE_OPTION) {
+                File carpetaDestino = fileChooser.getSelectedFile();
+                String nombreArchivo = "registro_" + fechaActual + ".csv";
+                String rutaCompleta = carpetaDestino.getAbsolutePath() + File.separator + nombreArchivo;
 
-                // Escribir encabezados
-                for (int i = 0; i < cols; i++) {
-                    writer.write(tabla.getColumnName(i));
-                    if (i < cols - 1) {
-                        writer.write(",");
-                    }
-                }
-                writer.newLine();
+                try (BufferedWriter writer = new BufferedWriter(new FileWriter(rutaCompleta))) {
+                    int cols = tabla.getColumnCount();
 
-                // Escribir datos
-                for (int i = 0; i < tabla.getRowCount(); i++) {
-                    for (int j = 0; j < cols; j++) {
-                        String cellValue = tabla.getValueAt(i, j).toString().replace('\n', ' ');
-                        writer.write(cellValue);
-                        if (j < cols - 1) {
+                    // Escribir encabezados
+                    for (int i = 0; i < cols; i++) {
+                        writer.write(tabla.getColumnName(i));
+                        if (i < cols - 1) {
                             writer.write(",");
                         }
                     }
                     writer.newLine();
-                }
 
-                JOptionPane.showMessageDialog(null, "Datos exportados a " + rutaCompleta, "Exportación Exitosa", JOptionPane.INFORMATION_MESSAGE);
-            } catch (IOException ex) {
-                ex.printStackTrace();
-                JOptionPane.showMessageDialog(null, "Error al exportar datos", "Error", JOptionPane.ERROR_MESSAGE);
+                    // Escribir datos
+                    for (int i = 0; i < tabla.getRowCount(); i++) {
+                        for (int j = 0; j < cols; j++) {
+                            String cellValue = tabla.getValueAt(i, j).toString().replace('\n', ' ');
+                            writer.write(cellValue);
+                            if (j < cols - 1) {
+                                writer.write(",");
+                            }
+                        }
+                        writer.newLine();
+                    }
+
+                    JOptionPane.showMessageDialog(null, "Datos exportados a " + rutaCompleta, "Exportación Exitosa", JOptionPane.INFORMATION_MESSAGE);
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(null, "Error al exportar datos", "Error", JOptionPane.ERROR_MESSAGE);
+                }
             }
         } catch (Exception ex) {
             ex.printStackTrace();
