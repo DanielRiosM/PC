@@ -5,17 +5,27 @@
 package com.mycompany.pc.views;
 
 import java.awt.Color;
-
-import com.mongodb.client.*;
-import com.mongodb.client.gridfs.*;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
+import java.awt.Image;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import org.bson.Document;
 import org.bson.types.ObjectId;
-
-import javax.swing.*;
-import java.awt.*;
-import java.io.IOException;
-import org.bson.conversions.Bson;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 
 /**
@@ -24,52 +34,115 @@ import org.bson.conversions.Bson;
  */
 public class informacion extends javax.swing.JPanel {
 
-    
-    String IDtecnico_update;
+     String IDtecnico_update;
+
     public informacion() {
         initComponents();
         IDtecnico_update = Registro.IDtecnico_update;
         InitStyles();
-        displayImage();
+
+        // Llamar a un método para cargar y mostrar la imagen
+        showImage();
+        showFirma();
     }
-    
-        private void InitStyles(){
-        
+
+    private void InitStyles() {
+        // Configura estilos de tu JPanel si es necesario
     }
-    
-        private void displayImage() {
-        MongoClient mongoClient = MongoClients.create("mongodb://localhost:27017"); // Cambia la URL de conexión según tu configuración
-        MongoDatabase database = mongoClient.getDatabase("Bic-edalmarc"); // Reemplaza "tu_base_de_datos" con el nombre de tu base de datos
-        GridFSBucket gridFSBucket = GridFSBuckets.create(database);
 
-        // Reemplaza "tu_id_mason" con el valor de id_mason que deseas utilizar para identificar la imagen
-        String idMason = IDtecnico_update;
+    // Método para cargar y mostrar la imagen desde MongoDB
+    private void showImage() {
+        try (MongoClient client = MongoClients.create("mongodb+srv://Edalmarc:udrNYnjBDhQvub8x@bic-edalmarc.svgqcpw.mongodb.net/Edalmarc?retryWrites=true&w=majority")) {
+            MongoDatabase database = client.getDatabase("Edalmarc");
+            MongoCollection<Document> collection = database.getCollection("images");
 
-        // Encuentra la imagen en la colección por id_mason
-        Bson filter = Filters.eq("id_mason", idMason);
-        FindIterable<Document> iterable = database.getCollection("images").find(filter);
-        Document imageDocument = iterable.first();
+            // Reemplaza "id_mason_value" con el valor real por el que deseas buscar
+            ObjectId idMasonValue = new ObjectId(IDtecnico_update);
+            System.out.println(idMasonValue);
+            
+            Document imageDocument = collection.find(Filters.eq("id_mason", idMasonValue)).first();
 
-        if (imageDocument != null) {
-            ObjectId imageId = imageDocument.getObjectId("_id");
+            if (imageDocument != null) {
+                Document imageObject = imageDocument.get("image", Document.class);
+                if (imageObject != null) {
+                    org.bson.types.Binary imageData = imageObject.get("data", org.bson.types.Binary.class);
+                    System.out.println(imageData);
+                    if (imageData != null) {
+                        byte[] imageDataBytes = imageData.getData();
 
-            try {
-                // Recuperar la imagen desde MongoDB
-                byte[] imageData = gridFSBucket.openDownloadStream(imageId).readAllBytes();
+                        // Cargar la imagen
+                    ImageIcon originalImageIcon = new ImageIcon(imageDataBytes);
 
-                ImageIcon imageIcon = new ImageIcon(imageData);
-                JLabel label = new JLabel(imageIcon);
-                bg.removeAll(); // Elimina cualquier componente anterior
-                bg.add(label);
-                revalidate(); // Vuelve a validar el panel para reflejar los cambios
-            } catch (IOException e) {
-                e.printStackTrace();
+                    // Redimensionar la imagen a 435x375 píxeles
+                    Image originalImage = originalImageIcon.getImage();
+                    Image resizedImage = originalImage.getScaledInstance(435, 375, Image.SCALE_SMOOTH);
+
+                    // Crear un ImageIcon a partir de la imagen redimensionada
+                    ImageIcon resizedImageIcon = new ImageIcon(resizedImage);
+
+                    // Establecer el ImageIcon redimensionado en el JLabel
+                    jLabel1.setIcon(resizedImageIcon);
+                    } else {
+                        jLabel1.setText("Los datos de la imagen son nulos.");
+                    }
+                } else {
+                    jLabel1.setText("El objeto 'image' no se encontró en el documento.");
+                }
+            } else {
+                jLabel1.setText("La imagen no se encontró en la base de datos.");
             }
-        } else {
-            System.out.println("No se encontró una imagen con id_mason: " + idMason);
+        } catch (Exception e) {
+            e.printStackTrace();
+            jLabel1.setText("Error al cargar la imagen.");
         }
     }
     
+        private void showFirma() {
+        try (MongoClient client = MongoClients.create("mongodb+srv://Edalmarc:udrNYnjBDhQvub8x@bic-edalmarc.svgqcpw.mongodb.net/Edalmarc?retryWrites=true&w=majority")) {
+            MongoDatabase database = client.getDatabase("Edalmarc");
+            MongoCollection<Document> collection = database.getCollection("firmas");
+
+            // Reemplaza "id_mason_value" con el valor real por el que deseas buscar
+            ObjectId idMasonValue = new ObjectId(IDtecnico_update);
+            System.out.println(idMasonValue);
+            
+            Document imageDocument = collection.find(Filters.eq("id_mason", idMasonValue)).first();
+
+            if (imageDocument != null) {
+                Document imageObject = imageDocument.get("firma", Document.class);
+                if (imageObject != null) {
+                    org.bson.types.Binary imageData = imageObject.get("data", org.bson.types.Binary.class);
+                    System.out.println(imageData);
+                    if (imageData != null) {
+                        byte[] imageDataBytes = imageData.getData();
+
+                            // Cargar la imagen
+                    ImageIcon originalImageIcon = new ImageIcon(imageDataBytes);
+
+                    // Redimensionar la imagen a 435x375 píxeles
+                    Image originalImage = originalImageIcon.getImage();
+                    Image resizedImage = originalImage.getScaledInstance(435, 375, Image.SCALE_SMOOTH);
+
+                    // Crear un ImageIcon a partir de la imagen redimensionada
+                    ImageIcon resizedImageIcon = new ImageIcon(resizedImage);
+
+                    // Establecer el ImageIcon redimensionado en el JLabel
+                    jLabel2.setIcon(resizedImageIcon);
+                    } else {
+                        jLabel2.setText("Los datos de la imagen son nulos.");
+                    }
+                } else {
+                    jLabel2.setText("El objeto 'image' no se encontró en el documento.");
+                }
+            } else {
+                jLabel2.setText("La imagen no se encontró en la base de datos.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            jLabel2.setText("Error al cargar la imagen.");
+        }
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -80,23 +153,42 @@ public class informacion extends javax.swing.JPanel {
     private void initComponents() {
 
         bg = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        jSeparator1 = new javax.swing.JSeparator();
 
         setBackground(new java.awt.Color(255, 255, 255));
-        setPreferredSize(new java.awt.Dimension(750, 430));
+        setPreferredSize(new java.awt.Dimension(1020, 720));
 
         bg.setBackground(new java.awt.Color(255, 255, 255));
         bg.setMinimumSize(new java.awt.Dimension(0, 0));
-        bg.setPreferredSize(new java.awt.Dimension(750, 430));
+        bg.setPreferredSize(new java.awt.Dimension(1020, 720));
+
+        jSeparator1.setForeground(new java.awt.Color(0, 0, 0));
 
         javax.swing.GroupLayout bgLayout = new javax.swing.GroupLayout(bg);
         bg.setLayout(bgLayout);
         bgLayout.setHorizontalGroup(
             bgLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 750, Short.MAX_VALUE)
+            .addGroup(bgLayout.createSequentialGroup()
+                .addGap(76, 76, 76)
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 435, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(bgLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jSeparator1)
+                    .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 435, Short.MAX_VALUE))
+                .addContainerGap(68, Short.MAX_VALUE))
         );
         bgLayout.setVerticalGroup(
             bgLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 430, Short.MAX_VALUE)
+            .addGroup(bgLayout.createSequentialGroup()
+                .addGap(101, 101, 101)
+                .addGroup(bgLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 375, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 375, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(231, 231, 231))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -107,12 +199,15 @@ public class informacion extends javax.swing.JPanel {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(bg, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(bg, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel bg;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JSeparator jSeparator1;
     // End of variables declaration//GEN-END:variables
 }

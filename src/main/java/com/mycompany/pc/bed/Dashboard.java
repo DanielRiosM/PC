@@ -8,6 +8,8 @@ import com.formdev.flatlaf.FlatLightLaf;
 import com.mycompany.pc.views.*;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Desktop;
+import java.net.URI;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
@@ -60,6 +62,8 @@ public class Dashboard extends javax.swing.JFrame {
         content.revalidate();
         content.repaint();
     }
+    
+  
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -161,13 +165,18 @@ public class Dashboard extends javax.swing.JFrame {
         configuracion1.setBackground(new java.awt.Color(122, 163, 162));
         configuracion1.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         configuracion1.setForeground(new java.awt.Color(255, 255, 255));
-        configuracion1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/figuras/configuracion.png"))); // NOI18N
-        configuracion1.setText("Configuración");
+        configuracion1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/figuras/ubicacion (1).png"))); // NOI18N
+        configuracion1.setText("Ubicacion");
         configuracion1.setBorder(javax.swing.BorderFactory.createMatteBorder(1, 12, 1, 1, new java.awt.Color(0, 0, 0)));
         configuracion1.setBorderPainted(false);
         configuracion1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         configuracion1.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         configuracion1.setIconTextGap(12);
+        configuracion1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                configuracion1ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout menuLayout = new javax.swing.GroupLayout(menu);
         menu.setLayout(menuLayout);
@@ -311,6 +320,16 @@ public class Dashboard extends javax.swing.JFrame {
         // TODO add your handling code here:
         ShowJPanel(new Registro());
     }//GEN-LAST:event_ReportesActionPerformed
+
+    private void configuracion1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_configuracion1ActionPerformed
+        // TODO add your handling code here:
+        try {
+            URI link = new URI("www.google.com/maps");
+            Desktop.getDesktop().browse(link);
+        } catch (Exception erro) {
+            System.out.println(erro);
+        }
+    }//GEN-LAST:event_configuracion1ActionPerformed
 
     /**
      * @param args the command line arguments

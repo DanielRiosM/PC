@@ -7,6 +7,7 @@ package com.mycompany.pc.views;
 import com.mycompany.pc.views.informacion;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.*;
@@ -15,6 +16,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.StringJoiner;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import javax.swing.JPanel;
@@ -70,13 +72,25 @@ public class Registro extends javax.swing.JPanel {
                 String column1Value = jsonObject.getString("_id");
                 String column2Value = jsonObject.getString("fechaInicio");
                 String column3Value = jsonObject.getString("fechaFinal");
-                JSONArray column4Value = jsonObject.getJSONArray("descripcion");
-                JSONArray column5Value = jsonObject.getJSONArray("materiales");
+                JSONArray column4Array = jsonObject.getJSONArray("descripcion");
+                StringJoiner materialsJoinerr = new StringJoiner(", "); // Utilizamos StringJoiner para concatenar los elementos del array
+                for (int j = 0; j < column4Array.length(); j++) {
+                    String material = column4Array.getString(j);
+                    materialsJoinerr.add(material);
+                }
+                String column4Value = materialsJoinerr.toString();
+                JSONArray column5Array = jsonObject.getJSONArray("materiales");
+                StringJoiner materialsJoiner = new StringJoiner(", "); // Utilizamos StringJoiner para concatenar los elementos del array
+                for (int j = 0; j < column5Array.length(); j++) {
+                    String material = column5Array.getString(j);
+                    materialsJoiner.add(material);
+                }
+                String column5Value = materialsJoiner.toString();
                 int column6Value = jsonObject.getInt("monto");
                 String column7Value = jsonObject.getString("responsable");
 
                 // Agregar una nueva fila a la tabla
-                model.addRow(new Object[]{column1Value, column2Value, column3Value, column4Value, column5Value, column6Value, column7Value});
+                model.addRow(new Object[]{column1Value, column2Value, column3Value, column4Value,column5Value, column6Value, column7Value});
             }
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -102,7 +116,7 @@ public class Registro extends javax.swing.JPanel {
                     frame.add(infoPanel, BorderLayout.WEST);
 
                     // Establecer el tamaño y otras propiedades del JFrame
-                    frame.setSize(750, 430);
+                    frame.setSize(1020, 720);
                     frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
                     frame.setVisible(true);
                 }
@@ -147,7 +161,7 @@ public class Registro extends javax.swing.JPanel {
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                true, true, false, true, true, true, true
+                false, false, false, false, false, false, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -155,6 +169,15 @@ public class Registro extends javax.swing.JPanel {
             }
         });
         jScrollPane1.setViewportView(tabla);
+        if (tabla.getColumnModel().getColumnCount() > 0) {
+            tabla.getColumnModel().getColumn(0).setResizable(false);
+            tabla.getColumnModel().getColumn(1).setResizable(false);
+            tabla.getColumnModel().getColumn(2).setResizable(false);
+            tabla.getColumnModel().getColumn(3).setResizable(false);
+            tabla.getColumnModel().getColumn(4).setResizable(false);
+            tabla.getColumnModel().getColumn(5).setResizable(false);
+            tabla.getColumnModel().getColumn(6).setResizable(false);
+        }
 
         javax.swing.GroupLayout bgLayout = new javax.swing.GroupLayout(bg);
         bg.setLayout(bgLayout);
@@ -166,8 +189,8 @@ public class Registro extends javax.swing.JPanel {
                 .addGap(227, 227, 227))
             .addGroup(bgLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 571, Short.MAX_VALUE)
-                .addGap(169, 169, 169))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 660, Short.MAX_VALUE)
+                .addGap(80, 80, 80))
         );
         bgLayout.setVerticalGroup(
             bgLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
