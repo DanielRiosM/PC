@@ -51,5 +51,10 @@
             <artifactId>bson</artifactId>
             <version>4.3.1</version> <!-- Asegúrate de usar la misma versión que tu controlador MongoDB -->
         </dependency>
+        <dependency>
+            <groupId>org.apache.pdfbox</groupId>
+            <artifactId>pdfbox</artifactId>
+            <version>2.0.27</version> <!-- La versión puede cambiar, verifica la última versión en el repositorio Maven -->
+        </dependency>
     </dependencies>
 </project>
