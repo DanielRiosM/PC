@@ -14,6 +14,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -41,7 +42,8 @@ public class Registro extends javax.swing.JPanel {
  
     String line;
     public static String IDtecnico_update ;
-    private final String rutaGuardado = "C:\\Users\\danie\\OneDrive\\Documentos\\pdf-edalmarc\\";  // Reemplaza esto con tu ruta personalizada
+    private final String nombreUsuario = System.getProperty("user.name");
+    private final String rutaCarpeta = "C:\\Users\\"+nombreUsuario+"\\edalmarc\\";  // Reemplaza esto con tu ruta personalizada
     public Registro() {
         
         initComponents();
@@ -246,12 +248,22 @@ public class Registro extends javax.swing.JPanel {
 
     private void descargarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_descargarActionPerformed
         // TODO add your handling code here:
-         try {
+        try {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
             String fechaActual = sdf.format(new Date());
 
             String nombreArchivo = "registro_" + fechaActual + ".csv";
-            String rutaCompleta = rutaGuardado + nombreArchivo;
+            String rutaCompleta = rutaCarpeta + nombreArchivo;
+
+            // Verificar si la carpeta existe, si no, crearla
+            File carpeta = new File(rutaCarpeta);
+            if (!carpeta.exists()) {
+                if (carpeta.mkdirs()) {
+                    System.out.println("Carpeta creada: " + rutaCarpeta);
+                } else {
+                    System.err.println("Error al crear la carpeta: " + rutaCarpeta);
+                }
+            }
 
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(rutaCompleta))) {
                 int cols = tabla.getColumnCount();
