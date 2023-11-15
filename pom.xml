@@ -61,5 +61,10 @@
             <artifactId>commons-csv</artifactId>
             <version>1.8</version> <!-- Verifica la versión más reciente en Maven Central -->
         </dependency>
+        <dependency>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>itextpdf</artifactId>
+            <version>5.5.13</version> <!-- Reemplaza esto con la versión más reciente disponible -->
+        </dependency>
     </dependencies>
 </project>
