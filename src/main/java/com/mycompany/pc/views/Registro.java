@@ -43,6 +43,7 @@ import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.font.PDFont;
 /**
  *
  * @author danie
@@ -272,10 +273,21 @@ public class Registro extends javax.swing.JPanel {
                     float yPosition = yStart;
                     float tableHeight = 20f; // Ajusta según sea necesario
                     float marginX = 50f;
-                    
+
                     float nexty = yStart;
-                    
+
                     for (int i = 0; i < tabla.getRowCount(); i++) {
+
+                        if (nexty - 15 < margin) {
+                            // Agregar una nueva página
+                            contentStream.close();
+                            page = new PDPage();
+                            document.addPage(page);
+                            contentStream = new PDPageContentStream(document, page);
+                            contentStream.setFont(PDType1Font.HELVETICA, 12);
+                            nexty = page.getMediaBox().getHeight() - margin;
+                        }
+
                         nexty -= 20;
                         contentStream.moveTo(marginX, nexty);
                         contentStream.lineTo(marginX + tableWidth, nexty);
@@ -284,23 +296,62 @@ public class Registro extends javax.swing.JPanel {
                         contentStream.setFont(PDType1Font.HELVETICA, 12);
                         contentStream.beginText();
                         contentStream.newLineAtOffset(marginX, nexty - 15);
-                        
-                        String materiales = tabla.getValueAt(i, 4).toString().replace('\n', ' ');
+
+                        String materiales = tabla.getValueAt(i, 4).toString();
+                        String[] lines = materiales.split("\\r?\\n");
+
+                        // Imprimir cada línea de materiales
+                        for (String line : lines) {
+                            float lineWidth = PDType1Font.HELVETICA.getStringWidth(line) / 1000 * 12;
+
+                            if (nexty - 15 < margin) {
+                                // Agregar una nueva página
+                                contentStream.endText();
+                                contentStream.close();
+                                page = new PDPage();
+                                document.addPage(page);
+                                contentStream = new PDPageContentStream(document, page);
+                                contentStream.setFont(PDType1Font.HELVETICA, 12);
+                                nexty = page.getMediaBox().getHeight() - margin;
+                                contentStream.beginText();
+                                contentStream.newLineAtOffset(marginX, nexty - 15);
+                            }
+
+                            List<String> sublines = splitText(line, PDType1Font.HELVETICA, 12, tableWidth);
+
+                            for (String subline : sublines) {
+                                contentStream.showText("Materiales: " + subline);
+                                contentStream.newLineAtOffset(0, -15);
+                                nexty -= 15;
+
+                                // Verificar si hay suficiente espacio en la página actual
+                                if (nexty - 15 < margin) {
+                                    // Agregar una nueva página
+                                    contentStream.endText();
+                                    contentStream.close();
+                                    page = new PDPage();
+                                    document.addPage(page);
+                                    contentStream = new PDPageContentStream(document, page);
+                                    contentStream.setFont(PDType1Font.HELVETICA, 12);
+                                    nexty = page.getMediaBox().getHeight() - margin;
+                                    contentStream.beginText();
+                                    contentStream.newLineAtOffset(marginX, nexty - 15);
+                                }
+                            }
+                        }
+
                         String monto = "$" + tabla.getValueAt(i, 5).toString().replace('\n', ' ');
                         String responsable = tabla.getValueAt(i, 6).toString().replace('\n', ' ');
-                        
-                   
-                        contentStream.showText("Materiales: "+materiales);
-                        contentStream.newLineAtOffset(0, -15);
-                        contentStream.showText("Monto: "+monto);
+
+                        contentStream.showText("Monto: " + monto);
                         contentStream.newLineAtOffset(tableWidth / 2, 0);
-                        contentStream.showText("responsable: "+responsable);
+                        contentStream.showText("responsable: " + responsable);
 
                         contentStream.endText();
 
                         nexty -= 15;
                     }
-                    
+
                 } catch (IOException ex) {
                     ex.printStackTrace();
                     JOptionPane.showMessageDialog(null, "Error al exportar datos a PDF", "Error", JOptionPane.ERROR_MESSAGE);
@@ -333,10 +384,41 @@ public class Registro extends javax.swing.JPanel {
             }
         } catch (Exception ex) {
             ex.printStackTrace();
-            JOptionPane.showMessageDialog(null, "Error al obtener la fecha actual", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_descargarActionPerformed
-    
+
+    private List<String> splitText(String text, PDFont font, float fontSize, float maxWidth) throws IOException {
+        List<String> lines = new ArrayList<>();
+        int lastSpace = -1;
+        float width = 0;
+
+        for (int i = 0; i < text.length(); i++) {
+            char character = text.charAt(i);
+            width += font.getStringWidth(String.valueOf(character)) / 1000 * fontSize;
+
+            if (character == ' ') {
+                lastSpace = i;
+            }
+
+            if (width > maxWidth) {
+                if (lastSpace >= 0) {
+                    lines.add(text.substring(0, lastSpace));
+                    text = text.substring(lastSpace + 1);
+                    i = 0;
+                    lastSpace = -1;
+                    width = 0;
+                } else {
+                    lines.add(text.substring(0, i));
+                    text = text.substring(i);
+                    i = 0;
+                    width = 0;
+                }
+            }
+        }
+
+        lines.add(text);
+        return lines;
+    }
     
 
 
