@@ -15,13 +15,17 @@ import javax.swing.table.DefaultTableModel;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.StringJoiner;
@@ -29,12 +33,16 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import javax.swing.JPanel;
 import javax.swing.filechooser.FileSystemView;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.PDPageContentStream.AppendMode;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
 /**
  *
  * @author danie
@@ -68,7 +76,7 @@ public class Registro extends javax.swing.JPanel {
             conn.setRequestProperty("Content-Type", "application/json");
             conn.setRequestProperty("User-Agent", "Mozilla/5.0");
 
-            BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8));
             StringBuilder response = new StringBuilder();
             String line;
 
@@ -177,24 +185,8 @@ public class Registro extends javax.swing.JPanel {
             new String [] {
                 "Id", "Fecha Inicio", "Fecha Final", "Descripcion", "Materiales", "Monto", "Responsable"
             }
-        ) {
-            boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, false
-            };
-
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit [columnIndex];
-            }
-        });
+        ));
         jScrollPane1.setViewportView(tabla);
-        if (tabla.getColumnModel().getColumnCount() > 0) {
-            tabla.getColumnModel().getColumn(0).setResizable(false);
-            tabla.getColumnModel().getColumn(1).setResizable(false);
-            tabla.getColumnModel().getColumn(2).setResizable(false);
-            tabla.getColumnModel().getColumn(3).setResizable(false);
-            tabla.getColumnModel().getColumn(4).setResizable(false);
-            tabla.getColumnModel().getColumn(6).setResizable(false);
-        }
 
         descargar.setBackground(new java.awt.Color(255, 255, 255));
         descargar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/figuras/descarga.png"))); // NOI18N
@@ -253,7 +245,6 @@ public class Registro extends javax.swing.JPanel {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
             String fechaActual = sdf.format(new Date());
 
-            // Configurar el JFileChooser
             JFileChooser fileChooser = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
             fileChooser.setDialogTitle("Seleccione la carpeta de destino");
             fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -263,37 +254,81 @@ public class Registro extends javax.swing.JPanel {
 
             if (userSelection == JFileChooser.APPROVE_OPTION) {
                 File carpetaDestino = fileChooser.getSelectedFile();
-                String nombreArchivo = "registro_" + fechaActual + ".csv";
+                String nombreArchivo = "registro_" + fechaActual + ".pdf";
                 String rutaCompleta = carpetaDestino.getAbsolutePath() + File.separator + nombreArchivo;
 
-                try (BufferedWriter writer = new BufferedWriter(new FileWriter(rutaCompleta))) {
-                    int cols = tabla.getColumnCount();
+                // Crear un nuevo documento PDF
+                PDDocument document = new PDDocument();
+                PDPage page = new PDPage();
+                document.addPage(page);
 
-                    // Escribir encabezados
-                    for (int i = 0; i < cols; i++) {
-                        writer.write(tabla.getColumnName(i));
-                        if (i < cols - 1) {
-                            writer.write(",");
+                PDPageContentStream contentStream = null; // Inicializar contentStream fuera del try para cerrarlo en finally
+
+                try {
+                    contentStream = new PDPageContentStream(document, page);
+                    float margin = 50;
+                    float yStart = page.getMediaBox().getHeight() - margin;
+                    float tableWidth = page.getMediaBox().getWidth() - 2 * margin;
+                    float yPosition = yStart;
+                    float tableHeight = 20f; // Ajusta según sea necesario
+                    float marginX = 50f;
+                    
+                    float nexty = yStart;
+                    
+                    for (int i = 0; i < tabla.getRowCount(); i++) {
+                        nexty -= 20;
+                        contentStream.moveTo(marginX, nexty);
+                        contentStream.lineTo(marginX + tableWidth, nexty);
+                        contentStream.stroke();
+
+                        contentStream.setFont(PDType1Font.HELVETICA, 12);
+                        contentStream.beginText();
+                        contentStream.newLineAtOffset(marginX, nexty - 15);
+                        
+                        String materiales = tabla.getValueAt(i, 4).toString().replace('\n', ' ');
+                        String monto = "$" + tabla.getValueAt(i, 5).toString().replace('\n', ' ');
+                        String responsable = tabla.getValueAt(i, 6).toString().replace('\n', ' ');
+                        
+                   
+                        contentStream.showText("Materiales: "+materiales);
+                        contentStream.newLineAtOffset(0, -15);
+                        contentStream.showText("Monto: "+monto);
+                        contentStream.newLineAtOffset(tableWidth / 2, 0);
+                        contentStream.showText("responsable: "+responsable);
+
+                        contentStream.endText();
+
+                        nexty -= 15;
+                    }
+                    
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(null, "Error al exportar datos a PDF", "Error", JOptionPane.ERROR_MESSAGE);
+                } finally {
+                    // Asegúrate de cerrar el PDPageContentStream en el bloque finally
+                    if (contentStream != null) {
+                        try {
+                            contentStream.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
                         }
                     }
-                    writer.newLine();
 
-                    // Escribir datos
-                    for (int i = 0; i < tabla.getRowCount(); i++) {
-                        for (int j = 0; j < cols; j++) {
-                            String cellValue = tabla.getValueAt(i, j).toString().replace('\n', ' ');
-                            writer.write(cellValue);
-                            if (j < cols - 1) {
-                                writer.write(",");
-                            }
+                    try {
+                        document.save(rutaCompleta);
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                        JOptionPane.showMessageDialog(null, "Error al guardar el documento PDF", "Error", JOptionPane.ERROR_MESSAGE);
+                    } finally {
+                        try {
+                            document.close();
+                        } catch (IOException ex) {
+                            ex.printStackTrace();
+                            JOptionPane.showMessageDialog(null, "Error al cerrar el documento PDF", "Error", JOptionPane.ERROR_MESSAGE);
                         }
-                        writer.newLine();
                     }
 
                     JOptionPane.showMessageDialog(null, "Datos exportados a " + rutaCompleta, "Exportación Exitosa", JOptionPane.INFORMATION_MESSAGE);
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                    JOptionPane.showMessageDialog(null, "Error al exportar datos", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         } catch (Exception ex) {
