@@ -33,6 +33,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import javax.swing.JPanel;
 import javax.swing.filechooser.FileSystemView;
+import javax.swing.table.TableRowSorter;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -69,6 +70,8 @@ public class Registro extends javax.swing.JPanel {
     
     public void tabla() {
         DefaultTableModel model = (DefaultTableModel) tabla.getModel();
+        TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(model);
+        tabla.setRowSorter(sorter);
         try {
             URL url = new URL("https://bic-edalmarc-back-end.cyclic.app/inform/read");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -121,6 +124,7 @@ public class Registro extends javax.swing.JPanel {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+        
 
         tabla.addMouseListener(new MouseAdapter() {
             @Override
@@ -168,6 +172,7 @@ public class Registro extends javax.swing.JPanel {
         jScrollPane1 = new javax.swing.JScrollPane();
         tabla = new javax.swing.JTable();
         descargar = new javax.swing.JButton();
+        clientes = new javax.swing.JButton();
 
         setBackground(new java.awt.Color(255, 255, 255));
         setPreferredSize(new java.awt.Dimension(750, 430));
@@ -186,8 +191,22 @@ public class Registro extends javax.swing.JPanel {
             new String [] {
                 "Id", "Fecha Inicio", "Fecha Final", "Descripcion", "Materiales", "Monto", "Responsable"
             }
-        ));
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
         jScrollPane1.setViewportView(tabla);
+        if (tabla.getColumnModel().getColumnCount() > 0) {
+            tabla.getColumnModel().getColumn(0).setPreferredWidth(10);
+            tabla.getColumnModel().getColumn(1).setPreferredWidth(25);
+            tabla.getColumnModel().getColumn(2).setPreferredWidth(25);
+            tabla.getColumnModel().getColumn(5).setPreferredWidth(20);
+        }
 
         descargar.setBackground(new java.awt.Color(255, 255, 255));
         descargar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/figuras/descarga.png"))); // NOI18N
@@ -196,6 +215,16 @@ public class Registro extends javax.swing.JPanel {
         descargar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 descargarActionPerformed(evt);
+            }
+        });
+
+        clientes.setBackground(new java.awt.Color(255, 255, 255));
+        clientes.setIcon(new javax.swing.ImageIcon(getClass().getResource("/figuras/cliente.png"))); // NOI18N
+        clientes.setBorder(null);
+        clientes.setBorderPainted(false);
+        clientes.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                clientesActionPerformed(evt);
             }
         });
 
@@ -214,6 +243,8 @@ public class Registro extends javax.swing.JPanel {
             .addGroup(bgLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(descargar, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(clientes, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         bgLayout.setVerticalGroup(
@@ -224,7 +255,9 @@ public class Registro extends javax.swing.JPanel {
                 .addGap(18, 18, 18)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 297, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(descargar, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(bgLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(descargar, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(clientes, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(41, 41, 41))
         );
 
@@ -387,6 +420,26 @@ public class Registro extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_descargarActionPerformed
 
+    private void clientesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clientesActionPerformed
+        // TODO add your handling code here:
+        clientes infoPanel = new clientes();
+
+        // Crear un JFrame para mostrar el JPanel
+        JFrame frame = new JFrame("clientes");
+
+        // Establecer el administrador de diseño BorderLayout para el JFrame
+        frame.setLayout(new BorderLayout());
+
+        // Agregar el JPanel al JFrame en la región izquierda (WEST)
+        frame.add(infoPanel, BorderLayout.WEST);
+
+        // Establecer el tamaño y otras propiedades del JFrame
+        frame.setSize(620, 550);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.setVisible(true);
+        
+    }//GEN-LAST:event_clientesActionPerformed
+
     private List<String> splitText(String text, PDFont font, float fontSize, float maxWidth) throws IOException {
         List<String> lines = new ArrayList<>();
         int lastSpace = -1;
@@ -424,6 +477,7 @@ public class Registro extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel bg;
+    private javax.swing.JButton clientes;
     private javax.swing.JButton descargar;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable tabla;
